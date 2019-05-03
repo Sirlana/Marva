@@ -1,0 +1,33 @@
+{
+    "request": {
+        "type": "POST",
+        "path": "/auth/user/{id}",
+        "default_error": {
+            "code": 400,
+            "message": "Error."
+        },
+        "param": {
+            "type": "form-data",
+            "data": "[string:email_username],[string:password],[string:product_id]"
+        },
+        "data_token": "[param:email_username]",
+        "sql": [{
+                "type": "select",
+                "query": "SELECT user_id, status_id, email, username, first_name, last_name, profile_photo FROM users WHERE username='[param:emailusername]' OR email='[param:email_username]' AND password='[param:password]'",
+                "error": {
+                    "code": 400,
+                    "message": "Invalid username or password."
+                }
+            }
+        ]
+    },
+    "response": {
+        "token": "[marva:token]",
+        "user_id": "[sql0:user_id]",
+        "email": "[sql0:email]",
+        "username": "[sql0:username]",
+        "first_name": "[sql0:first_name]",
+        "last_name": "[sql0:last_name]",
+        "profile_photo": "[sql0:profile_photo]"
+    }
+}

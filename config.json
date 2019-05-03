@@ -1,0 +1,36 @@
+{
+    "database": {
+        "driver": "mysql",
+        "username": "root",
+        "password": "password",
+        "host": "localhost",
+        "port": "3306",
+        "dbname": "db_test"
+    },
+    "migration": {
+        "driver": "file",
+        "folder": "migrations"
+    },
+    "server": {
+        "host": "localhost",
+        "port": "80",
+        "certificate": "/etc/letsencrypt/live/www/cert.pem",
+        "privkey": "/etc/letsencrypt/live/www/privkey.pem"
+    },
+    "api": {
+        "private": {
+            "token_key": "token_key",
+            "auth": [
+                "signin.json"
+            ],
+            "endpoints": [
+                "user.json"
+            ]
+        },
+        "public": {
+            "endpoints": [
+                "signup.json"
+            ]
+        }
+    }
+}
