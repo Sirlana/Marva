@@ -12,4 +12,4 @@
 *.out
 
 # Ignore folders
-app/
+app/*
