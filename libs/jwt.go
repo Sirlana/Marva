@@ -46,6 +46,16 @@ func (j JWT) IsExpired(exp float64) bool {
 	return true
 }
 
+func (j JWT) isValid(token string) bool {
+	if tkn, claims, err := j.Decode(token); err != nil && tkn.Valid {
+		if !j.IsExpired(claims["exp"].(float64)) {
+			return true
+		}
+		return false
+	}
+	return false
+}
+
 func (j JWT) Decode(t string) (*jwt.Token, jwt.MapClaims, error) {
 	token, err := jwt.Parse(t, func(token *jwt.Token) (interface{}, error) {
 		return []byte(j.Key), nil

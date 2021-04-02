@@ -1,0 +1,36 @@
+{
+    "database": {
+        "driver": "mysql",
+        "username": "root",
+        "password": "Rahasiaroot309",
+        "host": "138.68.172.206",
+        "port": "3306",
+        "dbname": "sirlana_dc"
+    },
+    "migration": {
+        "driver": "file",
+        "folder": "migrations"
+    },
+    "server": {
+        "host": "localhost",
+        "port": "8081",
+        "certificate": "/etc/letsencrypt/live/neo.sirl.me/cert.pem",
+        "privkey": "/etc/letsencrypt/live/neo.sirl.me/privkey.pem"
+    },
+    "api": {
+        "private": [
+            {
+                "key": "keyforprivateendpoints",
+                "auth": [
+                    "signin.json"
+                ],
+                "endpoints": [
+                    ""
+                ]
+            }
+        ],
+        "public": [
+            "signup.json"
+        ]
+    }
+}

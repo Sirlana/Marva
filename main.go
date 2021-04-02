@@ -12,18 +12,19 @@ import (
 
 func main() {
 	// Load config file and log.
-	cfg, err := libs.NewConfig()
+	r := mux.NewRouter()
+	util := libs.NewUtil()
 	log := libs.NewLogger()
-	if err != nil {
-		log.E("Error load config file.")
-		panic(err)
-	}
+	cfg := libs.NewConfig("config.json", util, log)
 
-	// Init mysql
-	mysql := db.NewMySQL(cfg.Database.Username, cfg.Database.Password, cfg.Database.DBName)
+	dbase := cfg.Database()
+	jwt := libs.NewJWT(cfg.API()["private"].(map[string]interface{})["token_key"].(string))
+	mysql := db.NewMySQL(dbase["username"].(string), dbase["password"].(string), dbase["dbname"].(string))
+
+	marva := libs.NewMarva(util, log, jwt, r, mysql)
 
 	// Open database connection.
-	if cfg.Database.Driver == "mysql" {
+	if dbase["driver"].(string) == "mysql" {
 		if err := mysql.Connect(); err != nil {
 			log.E("Database connection error.")
 			panic(err)
@@ -34,7 +35,6 @@ func main() {
 	}
 
 	// Init router.
-	r := mux.NewRouter()
 	mux.CORSMethodMiddleware(r)
 	// On the default page we will simply serve our static index page.
 	r.Handle("/", http.FileServer(http.Dir("./www/")))
@@ -42,7 +42,22 @@ func main() {
 	r.PathPrefix("/sir/").Handler(http.StripPrefix("/sir/", http.FileServer(http.Dir("./www/"))))
 
 	// Run Services
-	app.Run(r, mysql.GetDB())
+	app.Register(marva)
+
+	apiAuth := cfg.API()["private"].(map[string]interface{})["auth"].([]interface{})
+	for _, val := range apiAuth {
+		marva.Run(val.(string), true)
+	}
+
+	apiPrivate := cfg.API()["private"].(map[string]interface{})["endpoints"].([]interface{})
+	for _, val := range apiPrivate {
+		marva.Run(val.(string), true)
+	}
+
+	apiPublic := cfg.API()["public"].(map[string]interface{})["endpoints"].([]interface{})
+	for _, val := range apiPublic {
+		marva.Run(val.(string), false)
+	}
 
 	// Load services.
 	if err := cfg.LoadTLSServices(r); err != nil {
